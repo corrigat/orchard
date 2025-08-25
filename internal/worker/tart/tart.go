@@ -83,6 +83,7 @@ func List(ctx context.Context, logger *zap.SugaredLogger) ([]VMInfo, error) {
 			if err != nil {
 				return nil, err
 			}
+			logger.Infof("Found IP", address, "for vm", entries[i].Name)
 
 			entries[i].Ip = address
 		}
