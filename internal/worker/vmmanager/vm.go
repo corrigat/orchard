@@ -5,16 +5,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/avast/retry-go"
-	"github.com/cirruslabs/chacha/pkg/localnetworkhelper"
-	"github.com/cirruslabs/orchard/internal/worker/ondiskname"
-	"github.com/cirruslabs/orchard/internal/worker/tart"
-	"github.com/cirruslabs/orchard/pkg/client"
-	"github.com/cirruslabs/orchard/pkg/resource/v1"
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/metric"
-	"go.uber.org/zap"
-	"golang.org/x/crypto/ssh"
 	"io"
 	"net"
 	"strconv"
@@ -22,6 +12,17 @@ import (
 	"sync"
 	"sync/atomic"
 	"time"
+
+	"github.com/avast/retry-go"
+	"github.com/cirruslabs/chacha/pkg/localnetworkhelper"
+	"github.com/cirruslabs/orchard/internal/worker/ondiskname"
+	"github.com/cirruslabs/orchard/internal/worker/tart"
+	"github.com/cirruslabs/orchard/pkg/client"
+	v1 "github.com/cirruslabs/orchard/pkg/resource/v1"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/metric"
+	"go.uber.org/zap"
+	"golang.org/x/crypto/ssh"
 )
 
 var ErrVMFailed = errors.New("VM failed")
@@ -360,23 +361,9 @@ func (vm *VM) run(ctx context.Context) error {
 }
 
 func (vm *VM) IP(ctx context.Context) (string, error) {
-	// Bridged networking is problematic, so try with
-	// the agent resolver first using a small timeout
-	if vm.Resource.NetBridged != "" {
-		stdout, _, err := tart.Tart(ctx, vm.logger, "ip", "--wait", "5",
-			"--resolver", "agent", vm.id())
-		if err == nil {
-			return strings.TrimSpace(stdout), nil
-		}
-	}
+	args := []string{}
 
-	args := []string{"ip", "--wait", "60"}
-
-	if vm.Resource.NetBridged != "" {
-		args = append(args, "--resolver", "arp")
-	}
-
-	args = append(args, vm.id())
+	args = append(args, "ip", "--wait", "10", "--resolver", "arp", vm.id())
 
 	stdout, _, err := tart.Tart(ctx, vm.logger, args...)
 	if err != nil {

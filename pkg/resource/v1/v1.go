@@ -26,6 +26,7 @@ type VM struct {
 	DiskSize        uint64          `json:"diskSize,omitempty"`
 	NetSoftnet      bool            `json:"net-softnet,omitempty"`
 	NetBridged      string          `json:"net-bridged,omitempty"`
+	Ip              string          `json:"ip,omitempty"`
 	Headless        bool            `json:"headless,omitempty"`
 
 	// Status field is used to track the lifecycle of the VM associated with this resource.

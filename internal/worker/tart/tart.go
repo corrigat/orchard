@@ -6,9 +6,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"go.uber.org/zap"
 	"os/exec"
 	"strings"
+
+	"go.uber.org/zap"
 )
 
 const tartCommandName = "tart"
@@ -72,6 +73,15 @@ func List(ctx context.Context, logger *zap.SugaredLogger) ([]VMInfo, error) {
 	var entries []VMInfo
 
 	if err := json.Unmarshal([]byte(output), &entries); err != nil {
+		return nil, err
+	}
+
+	address, _, err := Tart(ctx, logger, "ip", "--wait", "10", "--resolver", "arp")
+	if err != nil {
+		return nil, err
+	}
+
+	if err := json.Unmarshal([]byte(address), &entries); err != nil {
 		return nil, err
 	}
 
