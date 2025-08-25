@@ -2,6 +2,9 @@ package get
 
 import (
 	"fmt"
+	"strings"
+	"time"
+
 	"github.com/cirruslabs/orchard/internal/structpath"
 	"github.com/cirruslabs/orchard/pkg/client"
 	v1 "github.com/cirruslabs/orchard/pkg/resource/v1"
@@ -9,8 +12,6 @@ import (
 	"github.com/gosuri/uitable"
 	"github.com/samber/lo"
 	"github.com/spf13/cobra"
-	"strings"
-	"time"
 )
 
 func newGetVMCommand() *cobra.Command {
@@ -92,6 +93,7 @@ func runGetVM(cmd *cobra.Command, args []string) error {
 
 	table.AddRow("Softnet enabled", vm.NetSoftnet)
 	table.AddRow("Bridged networking interface", nonEmptyOrNone(vm.NetBridged))
+	table.AddRow("IP Address", nonEmptyOrNone(vm.Ip))
 	table.AddRow("Headless mode", vm.Headless)
 	table.AddRow("Status", vm.Status)
 	table.AddRow("Status message", vm.StatusMessage)
