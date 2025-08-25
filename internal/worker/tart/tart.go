@@ -22,6 +22,7 @@ var (
 type VMInfo struct {
 	Name    string
 	Running bool
+	Ip      string
 }
 
 func Tart(
@@ -76,13 +77,13 @@ func List(ctx context.Context, logger *zap.SugaredLogger) ([]VMInfo, error) {
 		return nil, err
 	}
 
-	address, _, err := Tart(ctx, logger, "ip", "--wait", "10", "--resolver", "arp")
-	if err != nil {
-		return nil, err
-	}
+	for i := range entries {
+		address, _, err := Tart(ctx, logger, "ip", "--wait", "10", "--resolver", "arp", entries[i].Name)
+		if err != nil {
+			return nil, err
+		}
 
-	if err := json.Unmarshal([]byte(address), &entries); err != nil {
-		return nil, err
+		entries[i].Ip = address
 	}
 
 	return entries, nil
