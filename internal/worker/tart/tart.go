@@ -78,12 +78,14 @@ func List(ctx context.Context, logger *zap.SugaredLogger) ([]VMInfo, error) {
 	}
 
 	for i := range entries {
-		address, _, err := Tart(ctx, logger, "ip", "--wait", "10", "--resolver", "arp", entries[i].Name)
-		if err != nil {
-			return nil, err
-		}
+		if entries[i].Running {
+			address, _, err := Tart(ctx, logger, "ip", "--wait", "10", "--resolver", "arp", entries[i].Name)
+			if err != nil {
+				return nil, err
+			}
 
-		entries[i].Ip = address
+			entries[i].Ip = address
+		}
 	}
 
 	return entries, nil
