@@ -80,10 +80,10 @@ func List(ctx context.Context, logger *zap.SugaredLogger) ([]VMInfo, error) {
 	for i := range entries {
 		if entries[i].Running {
 			address, _, err := Tart(ctx, logger, "ip", "--wait", "10", "--resolver", "arp", entries[i].Name)
+			logger.Infof("Found IP", address, "for vm", entries[i].Name)
 			if err != nil {
 				return nil, err
 			}
-			logger.Infof("Found IP", address, "for vm", entries[i].Name)
 
 			entries[i].Ip = address
 		}
